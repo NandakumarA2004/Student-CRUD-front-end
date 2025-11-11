@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { getStudents, createStudent, deleteStudent } from '../api/Config';
+import { getStudents, createStudent, deleteStudent, updateStudent } from '../api/Config';
 
 const Students = () => {
   const [show, setShow] = useState(false);
+  const [editShow, setEditShow] = useState(false);
   const [Data, setData] = useState([]);
   const [input, setInput] = useState({
     name: "",
     course: "",
     marks: ""
   });
+  const [editInput, setEditInput] = useState({
+    name: "",
+    course: "",
+    marks: ""
+  });
+  const [editItem, setEditItem] = useState(null);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const handleEditClose = () => setEditShow(false);
+  const handleEditShow = (item) => {
+    setEditItem(item);
+    setEditInput({
+      name: item.name,
+      course: item.course,
+      marks: item.marks
+    });
+    setEditShow(true);
+  };
 
   useEffect(() => {
     getAllData();
@@ -34,7 +52,13 @@ const Students = () => {
 
   const handleDelete = async (id) => {
     await deleteStudent(id);
-    getAllData();  e
+    getAllData();
+  };
+
+  const handleUpdate = async () => {
+    await updateStudent(editItem.id, editInput);
+    getAllData();
+    handleEditClose();
   };
 
   return (
@@ -74,7 +98,10 @@ const Students = () => {
                       <td>{item.course}</td>
                       <td>{item.marks}</td>
                       <td>
-                        <button className="btn btn-sm btn-outline-success me-2">
+                        <button 
+                          className="btn btn-sm btn-outline-success me-2"
+                          onClick={() => handleEditShow(item)}
+                        >
                           <i className="bi bi-pencil-square"></i> Edit
                         </button>
                         <button 
@@ -123,6 +150,40 @@ const Students = () => {
           </Button>
           <Button variant="primary" onClick={handleAdd}>
             Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={editShow} onHide={handleEditClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Student</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <input 
+            placeholder='Name' 
+            className='form-control mb-2'
+            value={editInput.name}
+            onChange={(e) => setEditInput({ ...editInput, name: e.target.value })}
+          />
+          <input 
+            placeholder='Course' 
+            className='form-control mb-2'
+            value={editInput.course}
+            onChange={(e) => setEditInput({ ...editInput, course: e.target.value })}
+          />
+          <input 
+            placeholder='Marks' 
+            className='form-control mb-2'
+            value={editInput.marks}
+            onChange={(e) => setEditInput({ ...editInput, marks: e.target.value })}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleEditClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>
+            Update
           </Button>
         </Modal.Footer>
       </Modal>
