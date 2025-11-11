@@ -15,3 +15,6 @@ export const createStudent = (data) => {
 export const deleteStudent = (id) => {
   return apiClient.delete(`/students/${id}`);
 };
+export const updateStudent = (id, data) => {
+  return apiClient.put(`/students/${id}`, data);
+};
